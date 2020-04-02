@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    //TODO: send message in a specific room. Leave chat. Display members in the chat. Display available chats.
+    $(document).ready(function(){
+        const username = '{{ username }}';
+        $('#welcome').text(`Welcome, ${username}!`);
+        const socket = io.connect(window.location.host);
+        socket.on('connect', function () {
+            socket.emit('join', {username: username, room: 'dummy room'});
+        });
+
+        socket.on('message', function(msg){
+           $('#messages').append('<li>' + msg + '</li>');
+           console.log('Received message: ' + msg);
+        });
+
+        function sendMessage(){
+            socket.send($('#myMessage').val());
+            $('#myMessage').val('');
+        };
+
+        $('#myMessage').keyup(function(event){
+            if(event.which == 13){
+                sendMessage();
+            }
+        });
+
+        $('#sendButton').on('click', function(){
+            sendMessage();
+        });
+    });
+</script>
+<h1 id="welcome"></h1>
+<ul id="messages"></ul>
+<input type="text" id="myMessage">
+<button id="sendButton">Send</button>
+</body>
+</html>

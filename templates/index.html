@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room - Log In</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    const socket = io.connect(window.location.href);
+    $(document).ready(function() {
+        socket.on('connect', function () {
+            socket.send('A new user has visited the welcome page!');
+        });
+
+        //TODO: load users already logged in.
+
+        $('#join-form').submit(function (event) {
+            console.log('submitting form');
+            $.ajax({
+                url: '/join',
+                data: $(this).serialize(),
+                type: 'POST',
+                success: function(response) {
+                    console.log(response);
+                    console.log(response["result"]);
+                    if(!response.result){
+                        alert('Username ' + response.username + ' has already been used.');
+                    }
+                    else{
+                        window.location.replace('chat/' + response.username);
+                    }
+                },
+                error: function(error){
+                    alert(error);
+                    console.log(error);
+                }
+            });
+            event.preventDefault();
+        });
+    });
+</script>
+<div class="join-container">
+    <header class="join-header"><h1>Welcome to Chat Room. Please log in by creating a username.</h1></header>
+    <main class="join-main">
+        <form id="join-form">
+            <div class="form-control">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    placeholder="Enter username..."
+                    required
+                />
+                <input type="submit" id="submit" value="Join Chat">
+            </div>
+        </form>
+    </main>
+</div>
+
+</body>
+</html>
