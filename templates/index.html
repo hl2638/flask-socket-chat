@@ -1,64 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat Room - Log In</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-</head>
-<body>
-<script type="text/javascript">
-    const socket = io.connect(window.location.href);
-    $(document).ready(function() {
-        socket.on('connect', function () {
-            socket.send('A new user has visited the welcome page!');
-        });
-
-        //TODO: load users already logged in.
-
-        $('#join-form').submit(function (event) {
-            console.log('submitting form');
-            $.ajax({
-                url: '/join',
-                data: $(this).serialize(),
-                type: 'POST',
-                success: function(response) {
-                    console.log(response);
-                    console.log(response["result"]);
-                    if(!response.result){
-                        alert('Username ' + response.username + ' has already been used.');
-                    }
-                    else{
-                        window.location.replace('chat/' + response.username);
-                    }
-                },
-                error: function(error){
-                    alert(error);
-                    console.log(error);
-                }
-            });
-            event.preventDefault();
-        });
-    });
-</script>
-<div class="join-container">
-    <header class="join-header"><h1>Welcome to Chat Room. Please log in by creating a username.</h1></header>
-    <main class="join-main">
-        <form id="join-form">
-            <div class="form-control">
-                <label for="username">Username</label>
-                <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    placeholder="Enter username..."
-                    required
-                />
-                <input type="submit" id="submit" value="Join Chat">
+{# The style of the login snippet is borrowed from https://bootsnipp.com/snippets/dldxB by Raj78. #}
+{% extends 'template.html' %}
+{% block title %}Chat Room - Welcome{% endblock %}
+{% block script %}<script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>{% endblock %}
+{% block main_header %}Welcome to Chat room{% endblock %}
+{% block sub_header%}Please create a username to start.{% endblock %}
+{% block main_body %}
+    <div class="row m-0">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <div class="wrapper fadeInDown">
+                <div class="formContent">
+                <!-- Login Form -->
+                    <form id="join-form" >
+                        <label for="username" class="pt-3"><h3>Username</h3></label>
+                        <input type="text" class="my-3" id="username" name="username" placeholder="Enter username...">
+                        <input type="submit" class="btn py-3 my-3" value="Join Chat">
+                    </form>
+                </div>
             </div>
-        </form>
-    </main>
-</div>
-
-</body>
-</html>
+        </div>
+        <div class="col-4">
+            <div class="wrapper fadeInDown">
+                <div class="container rounded-lg px-3">
+                    <h3 class="px-3 pt-3">Active Users</h3>
+                    <ul id="active-user-list" class="shadow-lg list-group rounded-lg mx-3 px-3 py-3">
+                      <li class="list-group-item rounded">Dummy User</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

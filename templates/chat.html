@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Chat Room</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.1.0/mustache.min.js"></script>
 </head>
 <body>
 <script type="text/javascript">
@@ -13,21 +15,56 @@
         const username = '{{ username }}';
         $('#welcome').text(`Welcome, ${username}!`);
         const socket = io.connect(window.location.host);
+
         socket.on('connect', function () {
-            socket.emit('join', {username: username, room: 'dummy room'});
+            socket.emit('join', {username: username, room: 'Lobby', timestamp: get_timestamp()});
         });
 
-        socket.on('message', function(msg){
-           $('#messages').append('<li>' + msg + '</li>');
-           console.log('Received message: ' + msg);
+        socket.on('joinMessage', function(data){
+            console.log(data);
+            //here to avoid flask template rendering before mustache template is rendered, raw escape is used.
+            var msgTemplate = {% raw %}'<div class="message system-message-container"><div class="message message-header">System {{ timestamp }}</div><div class=" message message-text">{{ message }}</div></div>';{% endraw %}
+            var msgHTML = Mustache.to_html(msgTemplate, data);
+            console.log(msgHTML);
+           $('#message-window').append(msgHTML);
         });
+
+        socket.on('message', function(data){
+            console.log(data);
+            //here to avoid flask template rendering before mustache template is rendered, raw escape is used.
+            var msgTemplate = {% raw %}'<div class="message message-container"><div class="message message-header">{{ username }} {{ timestamp }}</div><div class=" message message-text">{{ message }}</div></div>';{% endraw %}
+            var msgHTML = Mustache.to_html(msgTemplate, data);
+            console.log(msgHTML);
+           $('#message-window').append(msgHTML);
+        });
+
+        socket.on('disconnect', function () {
+            socket.emit('disconnect', {username: username});
+        });
+
+        //=========ABOVE IS SOCKET BEHAVIOR
+        //=========BELOW ARE FUNCTIONS
+
+        function get_timestamp(){
+            var d = new Date();
+            //let h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
+            const timestamp = d.toTimeString().substring(0,8);
+            return timestamp;
+        }
 
         function sendMessage(){
-            socket.send($('#myMessage').val());
-            $('#myMessage').val('');
+            if($('#message-input').val().length == 0){
+                alert('Empty message.');
+                return;
+            }
+            const timestamp = get_timestamp();
+            const data = {username: username, timestamp: timestamp, message: $('#message-input').val()};
+            //console.log(data);
+            socket.send(data);
+            $('#message-input').val('');
         };
 
-        $('#myMessage').keyup(function(event){
+        $('#message-input').keyup(function(event){
             if(event.which == 13){
                 sendMessage();
             }
@@ -39,8 +76,31 @@
     });
 </script>
 <h1 id="welcome"></h1>
-<ul id="messages"></ul>
-<input type="text" id="myMessage">
-<button id="sendButton">Send</button>
+<div class="main-window">
+    <div class="chat-list">
+        <span>Chats</span>
+        <ul></ul>
+    </div>
+    <div class="chat-room chat-room-main">
+        <div class="chat-room head" id="chat-room-head">
+            <span>Chat Room Name placeholder</span>
+        </div>
+        <div class="chat-room chat-room-body">
+            <div class="chat-room chat-room-window">
+                <div class="message message-window" id="message-window">
+{#                    <div class="message message-container">#}
+{#                        <div class="message message-header">username timestamp</div>#}
+{#                        <div class="message message-text">dummy message</div>#}
+{#                    </div>#}
+                </div>
+                <div class="chat-room message-inputbox">
+                    <input type="text" id="message-input">
+                    <button id="sendButton">Send</button>
+                </div>
+            </div>
+            <div class="chat-room chat-room-meta head">Room metainfo placeholder</div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

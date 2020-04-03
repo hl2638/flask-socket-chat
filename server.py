@@ -2,6 +2,8 @@
 # https://www.youtube.com/watch?v=RdSrkkrj3l4&t=565s
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
+import time, datetime
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
@@ -11,8 +13,21 @@ list_users = []
 
 @socketio.on('message')
 def handleMessage(msg):
-    print("Message: " + msg)
+    print("Message: ", msg)
     send(msg, broadcast=True)
+
+
+@socketio.on('activeUsers')
+def handleActiveUsers():
+    print('Received active users request.')
+    print('Active userlist: ', list_users)
+    emit('activeUsers', [{'username': username} for username in list_users])
+
+
+@socketio.on('login')
+def handleLogin(data):
+    # socket.
+    pass
 
 
 # here join means joining a room, while later in this file on handling url, join means something different (see below)
@@ -20,11 +35,17 @@ def handleMessage(msg):
 def handleJoin(data):
     username, room = data['username'], data['room']
     join_room(room)
-    emit('joinMessage', "%s has joined %s" % (username, room), room=room)
-    print('joinMessage', "%s has joined %s" % (username, room))
+    emit('joinMessage', {'timestamp': data['timestamp'], 'message': "Welcome %s." % username, 'room': room}, room=room)
+    print("%s has joined %s" % (username, room))
+
 
 # ================================= ABOVE IS SOCKET IO.
 # ================================= BELOW IS FLASK ROUTING.
+
+# just to test css
+@app.route('/template')
+def template():
+    return render_template('template.html')
 
 @app.route('/')
 @app.route('/index.html')
