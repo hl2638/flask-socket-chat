@@ -2,13 +2,34 @@
 # https://www.youtube.com/watch?v=RdSrkkrj3l4&t=565s
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
-import time, datetime
-import json
+import time, datetime, json, threading
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app, cors_allowed_origins="*")
 list_users = []
+
+started_broadcast = False
+
+# TODO: broadcast available peers and chats to lobby
+
+
+# broadcast to welcome page list of active users
+def welcome_broadcast():
+    while True:
+        time.sleep(0.5)
+        print('emitting activeUsers')
+        socketio.emit('activeUsers', [{'username': username} for username in list_users], room='Welcome')
+
+
+def start_welcome_broadcast():
+    global started_broadcast
+    if started_broadcast:
+        return
+    else:
+        print("starting broadcast to welcome page")
+        started_broadcast = True
+        socketio.start_background_task(target=welcome_broadcast)
 
 
 @socketio.on('message')
@@ -16,12 +37,12 @@ def handleMessage(msg):
     print("Message: ", msg)
     send(msg, broadcast=True)
 
-
-@socketio.on('activeUsers')
-def handleActiveUsers():
-    print('Received active users request.')
-    print('Active userlist: ', list_users)
-    emit('activeUsers', [{'username': username} for username in list_users])
+#
+# @socketio.on('activeUsers')
+# def handleActiveUsers():
+#     print('Received active users request.')
+#     print('Active userlist: ', list_users)
+#     emit('activeUsers', [{'username': username} for username in list_users])
 
 
 @socketio.on('login')
@@ -35,8 +56,13 @@ def handleLogin(data):
 def handleJoin(data):
     username, room = data['username'], data['room']
     join_room(room)
-    emit('joinMessage', {'timestamp': data['timestamp'], 'message': "Welcome %s." % username, 'room': room}, room=room)
-    print("%s has joined %s" % (username, room))
+    if room == 'Welcome':
+        print("Someone has visited the homepage.")
+        start_welcome_broadcast()
+    else:
+        emit('systemMessage', {'timestamp': data['timestamp'], 'message': "Welcome %s." % username, 'room': room},
+             room=room)
+        print("%s has joined %s" % (username, room))
 
 
 # ================================= ABOVE IS SOCKET IO.
@@ -46,6 +72,7 @@ def handleJoin(data):
 @app.route('/template')
 def template():
     return render_template('template.html')
+
 
 @app.route('/')
 @app.route('/index.html')

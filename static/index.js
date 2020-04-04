@@ -1,13 +1,13 @@
 $(document).ready(function() {
     var socket = io.connect(window.location.host);
     socket.on('connect', function () {
-        socket.send('A new user has visited the welcome page!');
+        socket.emit('join', {username: username, room: 'Welcome'});
     });
 
-    setInterval(function(){
-        console.log('Sending activeusers request.');
-        socket.emit('activeUsers');
-    }, 1000);
+    // setInterval(function(){
+    //     console.log('Sending activeusers request.');
+    //     socket.emit('activeUsers');
+    // }, 1000);
 
     socket.on('activeUsers', function (data) {
         console.log('received active users.');
@@ -15,13 +15,13 @@ $(document).ready(function() {
         if(data.length > 0){
             $("#active-user-list").html('');
             for(var i=0; i<data.length; i++){
-                var msgTemplate = '<li class="list-group-item rounded">{{ username }}</li>';
+                var msgTemplate = '<li class="list-group-item rounded text-center">{{ username }}</li>';
                 var msgHTML = Mustache.to_html(msgTemplate, data[i]);
                 $("#active-user-list").append(msgHTML);
             }
         }
         else{
-            $("#active-user-list").html('<li class="list-group-item rounded">No active users for now...</li>');
+            $("#active-user-list").html('<li class="list-group-item rounded text-center">No active users for now...</li>');
         }
 
     });

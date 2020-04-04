@@ -13,12 +13,14 @@
 </head>
 <body>
 {% block script %}{% endblock %}
+{% block header %}
 <div class="container py-5 px-4">
     <header class="text-center">
         <h1 class="display-4 text-white" id="main-header">{% block main_header %}{% endblock %}</h1>
         <p class="text-white lead mb-0" id="sub-header">{% block sub_header %}{% endblock %}</p>
     </header>
 </div>
+{% endblock %}
 {% block main_body %}{% endblock %}
 </body>
 </html>

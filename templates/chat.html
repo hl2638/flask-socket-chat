@@ -1,33 +1,87 @@
+{# Part of the style of the chat room is borrowed from https://bootstrapious.com/p/bootstrap-chat #}
 {% extends 'template.html' %}
 {% block title %}Chat Room{% endblock %}
 {% block script %}<script type="text/javascript" src="{{ url_for('static', filename='chat.js') }}"></script>{% endblock %}
-{% block main_header %}Welcome, {% endblock %}
-{% block sub_header %}You are now in the lobby. Start a chat with someone, join an existing chat, or stay here!{% endblock %}
-<div class="main-window">
-    <div class="chat-list">
-        <span>Chats</span>
-        <ul></ul>
-    </div>
-    <div class="chat-room chat-room-main">
-        <div class="chat-room head" id="chat-room-head">
-            <span>Chat Room Name placeholder</span>
-        </div>
-        <div class="chat-room chat-room-body">
-            <div class="chat-room chat-room-window">
-                <div class="message message-window" id="message-window">
-{#                    <div class="message message-container">#}
-{#                        <div class="message message-header">username timestamp</div>#}
-{#                        <div class="message message-text">dummy message</div>#}
-{#                    </div>#}
-                </div>
-                <div class="chat-room message-inputbox">
-                    <input type="text" id="message-input">
-                    <button id="sendButton">Send</button>
-                </div>
-            </div>
-            <div class="chat-room chat-room-meta head">Room metainfo placeholder</div>
+{#{% block sub_header %}You are now in the lobby. Start a chat with someone, join an existing chat, or stay here!{% endblock %}#}
+{% block header %}
+<div class="container py-1">
+    <header class="text-center">
+        <h1 class="display-4 text-white" id="main-header">{{ username }}</h1>
+    <div class="row" style="position: static; height: 0px;">
+        <div class="alert alert-info alert-dismissible fade show rounded-lg" role="alert" style=" position: relative; top: 0; z-index: 9999; opacity: 85%;">
+            We don't use sessions so you can simulate multi-person chats on one host. For that reason you are logged out if you close browser tag or refresh. To re-login use url '/chat/&lt;username&gt;'.
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
     </div>
+    </header>
 </div>
-</body>
-</html>
+{% endblock %}
+{% block main_body %}
+<div class="main-window container h-75">
+
+    <div class="row h-100 rounded-lg overflow-hidden shadow">
+
+        <div class="col-3 d-flex flex-column bg-white  p-0" id="sidebar" >
+            <div class="bg-gray px-4 py-2 bg-light h-">
+              <p class="h5 mb-0 py-1 px-4">Chats</p>
+            </div>
+            <div class="list-group flex-grow-1 rounded-0" id="chat-list">
+                <a class="list-group-item list-group-item-action active text-white rounded-0">
+                  <div class="media">
+                    <div class="media-body ml-4">
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <h6 class="mb-0" id="peer-1">Jason Doe</h6><small class="small font-weight-bold">12:23:33</small>
+                      </div>
+                      <p class="font-italic mb-0 text-small">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.</p>
+                    </div>
+                  </div>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action list-group-item-light rounded-0">
+                  <div class="media">
+                    <div class="media-body ml-4">
+                      <div class="d-flex align-items-center justify-content-between mb-1">
+                        <h6 class="mb-0">Jason Doe</h6><small class="small font-weight-bold">12:23:00</small>
+                      </div>
+                      <p class="font-italic text-muted mb-0 text-small">Lorem ipsum dolor sit amet, consectetur. incididunt ut labore.</p>
+                    </div>
+                  </div>
+                </a>
+            </div>
+
+        </div>
+
+{#        TODO: replace chat message with styles from template.#}
+{#        TODO: add a leave chat button.#}
+{#        TODO: add scroll bar for sidebar and chat window.#}
+{#        TODO: add navbar and slide sidebar for available chats#}
+
+        <div class="col-9 d-flex flex-column bg-white p-0" id="chat-room">
+            <div class="bg-dark text-white px-4 py-2 bg-light">
+              <p class="h5 mb-0 py-1 px-4">Room</p>
+            </div>
+            <div class="row flex-grow-1">
+                    <div class="col-9 d-flex flex-column">
+                        <div class="px-4 py-5 d-flex flex-column bg-white flex-grow-1" id="message-window">
+                            <div class="message message-container">
+                                <div class="message message-header">username timestamp</div>
+                                <div class="message message-text">dummy message</div>
+                            </div>
+                        </div>
+                        <div id="message-inputbox">
+                            <input type="text" id="message-input">
+                            <button id="sendButton">Send</button>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="chat-room chat-room-meta head">Room metainfo placeholder</div>
+                    </div>
+                </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
