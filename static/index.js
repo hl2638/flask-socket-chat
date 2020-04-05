@@ -1,7 +1,7 @@
 $(document).ready(function() {
     var socket = io.connect(window.location.host);
     socket.on('connect', function () {
-        socket.emit('join', {username: username, room: 'Welcome'});
+        socket.emit('visit');
     });
 
     // setInterval(function(){

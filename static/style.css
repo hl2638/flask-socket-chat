@@ -125,7 +125,7 @@ input[type=text] {
   border: none;
   color: #0d0d0d;
   padding: 15px 32px;
-  text-align: center;
+  /*text-align: center;*/
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
@@ -173,4 +173,9 @@ input[type=text]::placeholder {
   -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
   box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
   text-align: center;
+}
+
+.alert-info:hover  {
+  background-color: navy;
+  color: white;
 }

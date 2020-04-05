@@ -7,19 +7,15 @@
 <div class="container py-1">
     <header class="text-center">
         <h1 class="display-4 text-white" id="main-header">{{ username }}</h1>
-    <div class="row" style="position: static; height: 0px;">
-        <div class="alert alert-info alert-dismissible fade show rounded-lg" role="alert" style=" position: relative; top: 0; z-index: 9999; opacity: 85%;">
-            We don't use sessions so you can simulate multi-person chats on one host. For that reason you are logged out if you close browser tag or refresh. To re-login use url '/chat/&lt;username&gt;'.
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
+    <div class="row" id="alert-row" style="position: relative; height: 0px;">
+        {% block alert %}{% endblock %}
+{#    usually this block won't be filled.#}
     </div>
     </header>
 </div>
 {% endblock %}
 {% block main_body %}
-<div class="main-window container h-75">
+<div class="main-window container" style="height: 85%;">
 
     <div class="row h-100 rounded-lg overflow-hidden shadow">
 
@@ -53,29 +49,43 @@
         </div>
 
 {#        TODO: replace chat message with styles from template.#}
-{#        TODO: add a leave chat button.#}
+{#        TODO: add a leave chat button. add a quit whole app button. change chat name button. #}
 {#        TODO: add scroll bar for sidebar and chat window.#}
 {#        TODO: add navbar and slide sidebar for available chats#}
 
         <div class="col-9 d-flex flex-column bg-white p-0" id="chat-room">
-            <div class="bg-dark text-white px-4 py-2 bg-light">
-              <p class="h5 mb-0 py-1 px-4">Room</p>
+            <div class="bg-dark text-white px-4 py-2 bg-light" id="chat-room-header">
+              <p class="h5 mb-0 py-1 px-4" id="room-name">Room</p>
             </div>
             <div class="row flex-grow-1">
                     <div class="col-9 d-flex flex-column">
                         <div class="px-4 py-5 d-flex flex-column bg-white flex-grow-1" id="message-window">
                             <div class="message message-container">
                                 <div class="message message-header">username timestamp</div>
-                                <div class="message message-text">dummy message</div>
+                                <div class="message message-text">Now you can use input box as command line. Check reaction on console.<br>
+                                    'sc username' will start a chat with someone.<br>
+                                    'cc chat_ID' will set the current chat to chat_ID<br>
+                                    'lc chat_ID' will make you leave chat_ID<br>
+                                    'jc chat_ID' will make you join chat_ID<br>
+                                    'byebye' will make you quit the app<br>
+                                </div>
                             </div>
                         </div>
-                        <div id="message-inputbox">
-                            <input type="text" id="message-input">
-                            <button id="sendButton">Send</button>
-                        </div>
+{#                        <div id="message-inputbox">#}
+{#                            <input type="text" id="message-input">#}
+{#                            <button id="sendButton">Send</button>#}
+{#                        </div>#}
+                        <form action="#" class="bg-light" id="message-form">
+                            <div class="input-group" id="message-input-box">
+                              <input type="text" placeholder="Type a message" id="message-input" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light">
+                              <div class="input-group-append">
+                                <button id="button-send-message" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
+                              </div>
+                            </div>
+                        </form>
                     </div>
                     <div class="col-3">
-                        <div class="chat-room chat-room-meta head">Room metainfo placeholder</div>
+                        <div class="chat-room chat-room-meta head">Room metainfo placeholder (display chat members)</div>
                     </div>
                 </div>
 
